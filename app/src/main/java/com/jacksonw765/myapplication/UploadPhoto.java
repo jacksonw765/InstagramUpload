@@ -15,6 +15,7 @@ public class UploadPhoto {
 
     Instagram4Android instagram;
 
+
     public UploadPhoto(String username, String password) {
         instagram = Instagram4Android.builder().username("jw.optical").password("rascalm123").build();
         instagram.setup();
@@ -26,16 +27,16 @@ public class UploadPhoto {
         }
     }
 
-    public void upload(String thumbnailPath) {
+    public String upload(File file, String caption) {
         try {
-
             instagram.login();
-            instagram.sendRequest(new InstagramUploadVideoRequest(
-                    new File(thumbnailPath),
-                    "Posted with Instagram4j @jacksonw765, how cool is that?"));
-            System.out.println("Done!");
+            instagram.sendRequest(new InstagramUploadPhotoRequest(
+                    (file),
+                    caption));
         } catch (IOException e) {
             e.printStackTrace();
+            return "RESULT ERROR";
         }
+        return "RESULT_OK";
     }
 }
