@@ -11,6 +11,7 @@ public class Post {
     private String caption;
     private int PostID;
     private File file;
+    private double timeTillPost;
 
     Post() {
 

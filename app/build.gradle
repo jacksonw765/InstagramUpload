@@ -35,6 +35,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'com.github.charlieAndroidDev:Instagram4Android:0.2.3'
     compile 'com.kbeanie:multipicker:1.1.31@aar'
-    compile 'com.birbit:android-priority-jobqueue:2.0.1'
-    compile 'io.hypertrack:smart-scheduler:0.0.11'
 }
