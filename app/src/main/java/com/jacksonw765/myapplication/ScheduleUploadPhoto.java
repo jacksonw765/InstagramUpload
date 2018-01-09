@@ -19,9 +19,10 @@ import dev.niekirk.com.instagram4android.requests.InstagramUploadVideoRequest;
 
 public class ScheduleUploadPhoto {
 
-    Login login;
-    Instagram4Android instagram;
-    Context context;
+    private Login login;
+    private Instagram4Android instagram;
+    private Context context;
+    private Notification notification;
 
     public ScheduleUploadPhoto(Context context) {
         if(login == null || !login.isLoggedIn()) {
@@ -32,10 +33,11 @@ public class ScheduleUploadPhoto {
             instagram = login.getInstagram();
         }
         this.context = context;
+        notification = new Notification(context);
     }
 
-    public void scheduleUpload(final File file, final String caption, long timeTillUpload) {
-        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+    public void scheduleUpload(final File file, final String caption, int timeTillUpload) {
+        ScheduledExecutorService exec = Executors.newScheduledThreadPool(timeTillUpload);
         Toast.makeText(context, "Photo Upload Scheduled", Toast.LENGTH_LONG).show();
         exec.schedule(new Runnable(){
             @Override
@@ -51,7 +53,7 @@ public class ScheduleUploadPhoto {
             instagram.sendRequest(new InstagramUploadPhotoRequest(
                     (file),
                     caption));
-            Toast.makeText(context, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+            notification.pushNotification();
         } catch (IOException e) {
             e.printStackTrace();
         }

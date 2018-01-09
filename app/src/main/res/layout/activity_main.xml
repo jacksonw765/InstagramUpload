@@ -6,11 +6,27 @@
     android:layout_height="match_parent"
     tools:context="com.jacksonw765.myapplication.MainActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="vertical"/>
+    </ScrollView>
+
     <Button
         android:id="@+id/buttonNewPhoto"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_marginBottom="54dp"
         android:text="Upload Photo" />
+
+
+
 </RelativeLayout>

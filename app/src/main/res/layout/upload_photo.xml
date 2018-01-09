@@ -1,16 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageView2"
+    <Button
+        android:id="@+id/buttonSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="138dp"
-        tools:layout_editor_absoluteY="16dp"
-        tools:ignore="MissingConstraints" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_below="@+id/buttonPickImage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp"
+        android:text="Schedule Post" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <EditText
+        android:id="@+id/textViewDate"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView"
+        android:layout_marginTop="19dp"
+        android:layout_toStartOf="@+id/buttonSchedule"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Date" />
+
+    <EditText
+        android:id="@+id/textViewTime"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/textViewDate"
+        android:layout_below="@+id/textViewDate"
+        android:ems="10"
+        android:layout_marginTop="10dp"
+        android:inputType="textPersonName"
+        android:text="Time" />
+
+    <Button
+        android:id="@+id/buttonSetTime"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewTime"
+        android:layout_alignStart="@+id/buttonSetDate"
+        android:text="Set Time" />
+
+    <Button
+        android:id="@+id/buttonSetDate"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewDate"
+        android:layout_marginStart="9dp"
+        android:layout_toEndOf="@+id/textCaption"
+        android:text="Set Date" />
+
+    <Button
+        android:id="@+id/buttonPickImage"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/buttonSetTime"
+        android:layout_below="@+id/buttonSetTime"
+        android:layout_marginTop="13dp"
+        android:text="Pick Image" />
+
+    <EditText
+        android:id="@+id/textCaption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonSchedule"
+        android:layout_alignStart="@+id/textViewTime"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Caption" />
+
+</RelativeLayout>
+</ScrollView>
