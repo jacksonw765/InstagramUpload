@@ -1,22 +1,17 @@
 package com.jacksonw765.myapplication;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Looper;
-import android.os.StrictMode;
-import android.support.v7.app.ActionBar;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,14 +25,11 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import dev.niekirk.com.instagram4android.Instagram4Android;
-import dev.niekirk.com.instagram4android.requests.InstagramUploadPhotoRequest;
-
-public class MainActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener{
+public class MainActivity extends AppCompatActivity {
 
     private Button button;
     private ImagePicker imagePicker;
@@ -47,19 +39,15 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
 
     private File photo = null;
     private String caption = null;
-    private long timeTillUpload = -1;
+    private int timeTillUpload = -1;
 
-    //private ScheduleUploadPhoto scheduleUploadPhoto;
+    private AlertDialog dialog;
+
+
     private Button buttonSetDate, buttonSetTime, buttonPickImage, buttonSchedule;
     private ImageView imagePreview;
-    private TextView textDate, textTime;
+    private TextView textDate, textTime, textViewCaption;
     private DateTimePicker dateTimePicker;
-
-
-    private int day;
-    private int hour;
-    private int minute;
-
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -101,8 +89,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
                                             System.out.println("file exists");
                                         }
 
-                                        ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(context);
-                                        scheduleUploadPhoto.scheduleUpload(new File(file.getPath()), "this is a test",0);
+
                                     }
                                 });
                                 t.start();
@@ -112,21 +99,19 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
                                 System.out.println(s);
                             }
                         });
-
-
-
                         Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_SHORT).show();*/
                     }
         });
 
     }
 
-
+    //This method is very messy! Sorry future me :/
     public void showNewPhotoDialog(View view) {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
-        View promptView = layoutInflater.inflate(R.layout.upload_photo, null);
+        final View promptView = layoutInflater.inflate(R.layout.upload_photo, null);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
         //ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(getApplicationContext());
         dateTimePicker = new DateTimePicker();
         buttonPickImage = promptView.findViewById(R.id.buttonPickImage);
@@ -136,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
         imagePreview = promptView.findViewById(R.id.imageView);
         textDate = promptView.findViewById(R.id.textViewDate);
         textTime = promptView.findViewById(R.id.textViewTime);
+        textViewCaption = promptView.findViewById(R.id.textCaption);
 
 
         buttonSetDate.setOnClickListener(new View.OnClickListener() {
@@ -172,71 +158,47 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
             }
         });
 
+        //FINAL METHOD CALLED BE CAREFUL!!!!
         buttonSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
+                    caption = String.valueOf(textViewCaption.getText());
+                    timeTillUpload = dateTimePicker.getCalculatedTime();
+                } catch (Exception e) {
+                    Toast.makeText(promptView.getContext(), "Caption can't be blank", Toast.LENGTH_SHORT).show();
+                }
                 if(photo == null || caption == null || timeTillUpload == -1) {
                     Toast.makeText(view.getContext(), "Not all variables set!", Toast.LENGTH_SHORT).show();
-
+                }
+                else {
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Looper.prepare();
+                            ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(context);
+                            scheduleUploadPhoto.scheduleUpload(new File(photo.getPath()), caption, timeTillUpload);
+                            Toast.makeText(getApplicationContext(), "Photo Scheduled", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    dialog.dismiss();
+                    thread.start();
+                    //alertDialogBuilder.dis
 
                 }
             }
         });
         alertDialogBuilder.setView(promptView);
-        alertDialogBuilder.show();
+        dialog = alertDialogBuilder.show();
 
-    }
-
-    private int getCalculatedTime() {
-
-        //ToDo
-        Calendar cal = Calendar.getInstance();
-        int currentDay = cal.get(Calendar.DAY_OF_MONTH);
-        int currentHour = cal.get(Calendar.HOUR);
-        int currentMinute = cal.get(Calendar.MINUTE);
-
-        int dayDif, hourDif, minDif;
-
-        if(currentDay == day) {
-
-        }
-        if(currentHour == hour) {
-
-        }
-
-        if(currentMinute == minute) {
-
-        }
-
-    }
-
-    private void getDate(int day) {
-        this.day = day;
-    }
-
-    private void getTime(int hour, int minute) {
-        this.hour = hour;
-        this.minute = minute;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-             //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
-
                  //File write logic here
                  if(requestCode == Picker.PICK_IMAGE_DEVICE) {
                      imagePicker.submit(data);
                  }
     }
 
-    @Override
-    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        getDate(dayOfMonth);
-        textDate.setText(dayOfMonth);
-    }
-
-    @Override
-    public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-        getTime(hourOfDay, minute);
-    }
 }

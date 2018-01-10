@@ -38,7 +38,7 @@ public class ScheduleUploadPhoto {
 
     public void scheduleUpload(final File file, final String caption, int timeTillUpload) {
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(timeTillUpload);
-        Toast.makeText(context, "Photo Upload Scheduled", Toast.LENGTH_LONG).show();
+        //Toast.makeText(, "Photo Upload Scheduled", Toast.LENGTH_LONG).show();
         exec.schedule(new Runnable(){
             @Override
             public void run() {
