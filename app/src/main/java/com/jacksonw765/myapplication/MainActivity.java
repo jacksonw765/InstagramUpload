@@ -12,8 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,7 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -48,11 +51,14 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imagePreview;
     private TextView textDate, textTime, textViewCaption;
     private DateTimePicker dateTimePicker;
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.listView);
 
         button = findViewById(R.id.buttonNewPhoto);
         button.setOnClickListener(new View.OnClickListener() {
@@ -60,49 +66,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 showNewPhotoDialog(view);
 
-                /*
-
-                uploadPhoto = new UploadPhoto(dialog);
-
-                //showPhotoDialog(view);
-
-
-                dpd.show(getFragmentManager(), "Datepickerdialog");
-
-                        imagePicker = new ImagePicker(MainActivity.this);
-                        imagePicker.setImagePickerCallback(new ImagePickerCallback() {
-                            @Override
-                            public void onImagesChosen(final List<ChosenImage> list) {
-                                Thread t = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Looper.prepare();
-                                        ChosenImage chosenImage = list.get(0);
-
-                                        Post post = new Post();
-
-                                        File file = new File(chosenImage.getOriginalPath());
-                                        System.out.println(file.canRead());
-                                        System.out.println(file.canExecute());
-                                        System.out.println(file.canWrite());
-                                        if(file.exists()) {
-                                            System.out.println("file exists");
-                                        }
-
-
-                                    }
-                                });
-                                t.start();
-                            }
-                            @Override
-                            public void onError(String s) {
-                                System.out.println(s);
-                            }
-                        });
-                        Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_SHORT).show();*/
-                    }
+            }
         });
-
     }
 
     //This method is very messy! Sorry future me :/
@@ -110,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         final View promptView = layoutInflater.inflate(R.layout.upload_photo, null);
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
+        adapter = new ArrayAdapter(this,
+                android.R.layout.simple_list_item_1);
+        listView.setAdapter(adapter);
 
         //ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(getApplicationContext());
         dateTimePicker = new DateTimePicker();
@@ -122,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
         textDate = promptView.findViewById(R.id.textViewDate);
         textTime = promptView.findViewById(R.id.textViewTime);
         textViewCaption = promptView.findViewById(R.id.textCaption);
-
 
         buttonSetDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     dialog.dismiss();
                     thread.start();
+                    adapter.add(caption);
                     //alertDialogBuilder.dis
 
                 }
@@ -190,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
         });
         alertDialogBuilder.setView(promptView);
         dialog = alertDialogBuilder.show();
-
     }
 
     @Override

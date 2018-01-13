@@ -45,7 +45,6 @@ public class ScheduleUploadPhoto {
                 uploadPhoto(file, caption);
             }
         }, timeTillUpload, TimeUnit.MINUTES);
-
     }
 
     private void uploadPhoto(File file, String caption) {
