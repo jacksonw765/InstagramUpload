@@ -21,10 +21,6 @@ public class DateTimePicker extends Activity implements TimePickerDialog.OnTimeS
     private int hour = -1;
     private int minute = -1;
 
-    public DateTimePicker() {
-
-    }
-
     public void displayDatePicker(FragmentManager fragmentManager) {
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(

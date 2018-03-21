@@ -1,15 +1,23 @@
 package com.jacksonw765.myapplication;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -65,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showNewPhotoDialog(view);
-
             }
         });
     }
@@ -79,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                 android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
 
-        //ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(getApplicationContext());
         dateTimePicker = new DateTimePicker();
         buttonPickImage = promptView.findViewById(R.id.buttonPickImage);
         buttonSetTime = promptView.findViewById(R.id.buttonSetTime);
@@ -89,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
         textDate = promptView.findViewById(R.id.textViewDate);
         textTime = promptView.findViewById(R.id.textViewTime);
         textViewCaption = promptView.findViewById(R.id.textCaption);
+
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                1);
 
         buttonSetDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,20 +110,49 @@ public class MainActivity extends AppCompatActivity {
         buttonSetTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Date currentTime = Calendar.getInstance().getTime();
                 dateTimePicker.displayTimePicker(getFragmentManager());
             }
         });
 
         buttonPickImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
+
                 imagePicker = new ImagePicker(MainActivity.this);
                 imagePicker.setImagePickerCallback(new ImagePickerCallback() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onImagesChosen(List<ChosenImage> list) {
-                        photo = new File(list.get(0).getOriginalPath());
-                        Bitmap myBitmap = BitmapFactory.decodeFile(photo.getAbsolutePath());
-                        imagePreview.setImageBitmap(myBitmap);
+                            photo = new File(list.get(0).getOriginalPath());
+                            Bitmap myBitmap = BitmapFactory.decodeFile((photo.getAbsolutePath()));
+                            imagePreview.setImageBitmap(myBitmap);
+
+                            double width = myBitmap.getWidth();
+                            double height = myBitmap.getHeight();
+
+                            /*
+                            if(((width/height) == 1.0)) {
+                                AlertDialog.Builder builder;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    builder = new AlertDialog.Builder(view.getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                                } else {
+                                    builder = new AlertDialog.Builder(view.getContext());
+                                }
+                                builder.setTitle("Warning")
+                                        .setMessage("The image you selected is not in proper Instagram format. This could create some problems when uploading." +
+                                                " It is recommended to resize the image and then select it again. Thank you.")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // continue with delete
+                                            }
+                                        })
+                                        .show();
+                            }
+                            */
+
+                        System.out.println(myBitmap.getHeight());
+                        System.out.println(myBitmap.getWidth());
                     }
                     @Override
                     public void onError(String s) {
@@ -142,8 +181,8 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Looper.prepare();
-                            ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(context);
-                            scheduleUploadPhoto.scheduleUpload(new File(photo.getPath()), caption, timeTillUpload);
+                            ScheduleUploadPhoto scheduleUploadPhoto = new ScheduleUploadPhoto(getApplicationContext());
+                            scheduleUploadPhoto.scheduleUpload(new File((photo.getPath())), caption, timeTillUpload);
                             Toast.makeText(getApplicationContext(), "Photo Scheduled", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -159,12 +198,27 @@ public class MainActivity extends AppCompatActivity {
         dialog = alertDialogBuilder.show();
     }
 
+    @NonNull
+    private String fixFilePath(String badPath) {
+        String[] split = photo.getAbsolutePath().split(":");
+        return split[1].substring(1);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                  //File write logic here
                  if(requestCode == Picker.PICK_IMAGE_DEVICE) {
                      imagePicker.submit(data);
                  }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            //Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+            //resume tasks needing this permission
+        }
     }
 
 }
